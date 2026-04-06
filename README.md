@@ -2,7 +2,7 @@
 
 A self-hosted app platform where AI agents and humans work side by side. Paste in a project plan and the system breaks it into tasks, spins up specialized agents with individual skills, and assigns a project manager to keep everything on track. Agents interact with every app in the suite through built-in tools — scheduling meetings, editing documents, managing inventory, printing labels, composing music, and more.
 
-Built with [Bun](https://bun.sh) and Rust. 19 apps. No cloud dependencies.
+Built with [Bun](https://bun.sh) and Rust. 16 apps. No cloud dependencies.
 
 ---
 
@@ -41,10 +41,7 @@ Built with [Bun](https://bun.sh) and Rust. 19 apps. No cloud dependencies.
 |-----|-------------|-------|
 | [vm-provisioner](vm-provisioner/) | Multi-backend VM manager (Firecracker, QEMU, Docker) with real-time web dashboard | Bun |
 | [virtual-client](virtual-client/) | Browser-based x86 emulator powered by v86 WebAssembly | Bun, v86 |
-| [iso-builder](iso-builder/) | Interactive TUI for building custom Linux live ISOs | Bash |
-| [fc-image-builder](fc-image-builder/) | Build Firecracker microVM rootfs and kernel images from scratch | Bash |
 | [qemu-image-builder](qemu-image-builder/) | Build QEMU/KVM disk images with custom packages | Bash |
-| [codebaux](codebaux/) | Browser-based code sandbox backed by Firecracker microVMs | Firecracker |
 
 ---
 
@@ -173,13 +170,6 @@ Open `http://localhost:3200`, paste a plan, and launch your agents.
 ### Build a VM image
 
 ```bash
-# Linux live ISO
-cd iso-builder && sudo ./build-iso.sh --hostname mybox --packages vim,curl
-
-# Firecracker microVM
-cd fc-image-builder && sudo ./build-image.sh --size 512M --packages nodejs
-
-# QEMU disk image
 cd qemu-image-builder && sudo ./build-image.sh --format qcow2 --size 2G
 ```
 

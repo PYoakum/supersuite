@@ -2,7 +2,7 @@
 
 A self-hosted app platform where AI agents and humans work side by side. Paste in a project plan and the system breaks it into tasks, spins up specialized agents with individual skills, and assigns a project manager to keep everything on track. Agents interact with every app in the suite through built-in tools — scheduling meetings, editing documents, managing inventory, printing labels, composing music, and more.
 
-Built with [Bun](https://bun.sh) and Rust. 13 apps. No cloud dependencies.
+Built with [Bun](https://bun.sh) and Rust. No cloud dependencies.
 
 ---
 
@@ -94,7 +94,7 @@ Agents interact with the world through typed tool calls. The LLM decides when an
 
 | Category | Tools |
 |----------|-------|
-| **Suite apps** | calendar, noted, wiki, community-board, asset-mapper, warehouse, p-mail, vidiyo, yolodex, rs-label, forms-builder, spreadsheet-builder, codebaux |
+| **Suite apps** | calendar, noted, wiki, community-board, asset-mapper, warehouse, p-mail, vidiyo, yolodex, rs-label, forms-builder, spreadsheet-builder |
 | **Code & files** | bash-command, code-editor, file-create, read-file, js-execute, python-runner, golang-exec, framework-exec, project-scaffold, git-host |
 | **Research** | browser-request, context-research-browser, analyze-research, review-research, http-request |
 | **Media** | create-image, create-drum, midi-mp3, edit-audio, audio-cleanup, tts, stt, voice-clone, create-mesh, create-obj, post-image, post-voice-note |

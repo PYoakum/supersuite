@@ -2,7 +2,7 @@
 
 A self-hosted app platform where AI agents and humans work side by side. Paste in a project plan and the system breaks it into tasks, spins up specialized agents with individual skills, and assigns a project manager to keep everything on track. Agents interact with every app in the suite through built-in tools — scheduling meetings, editing documents, managing inventory, printing labels, composing music, and more.
 
-Built with [Bun](https://bun.sh) and Rust. 16 apps. No cloud dependencies.
+Built with [Bun](https://bun.sh) and Rust. 13 apps. No cloud dependencies.
 
 ---
 
@@ -34,14 +34,6 @@ Built with [Bun](https://bun.sh) and Rust. 16 apps. No cloud dependencies.
 |-----|-------------|-------|
 | [community-board](community-board/) | BBS-style forum with categories, threads, and direct messages | Bun, PostgreSQL |
 | [yolodex](yolodex/) | Nonprofit CRM for contacts, donations, memberships, and SMTP outreach | Bun |
-
-### Infrastructure
-
-| App | Description | Stack |
-|-----|-------------|-------|
-| [vm-provisioner](vm-provisioner/) | Multi-backend VM manager (Firecracker, QEMU, Docker) with real-time web dashboard | Bun |
-| [virtual-client](virtual-client/) | Browser-based x86 emulator powered by v86 WebAssembly | Bun, v86 |
-| [qemu-image-builder](qemu-image-builder/) | Build QEMU/KVM disk images with custom packages | Bash |
 
 ---
 
@@ -166,12 +158,6 @@ cd team-maker && bun run src/server.ts   # orchestrator on :3200
 ```
 
 Open `http://localhost:3200`, paste a plan, and launch your agents.
-
-### Build a VM image
-
-```bash
-cd qemu-image-builder && sudo ./build-image.sh --format qcow2 --size 2G
-```
 
 ---
 

@@ -1,0 +1,174 @@
+# ── Identity ──────────────────────────────────────
+[identity]
+sender_id = "analyst-agent"
+display_name = "Analyst"
+role = "analysis"
+sender_type = "agent"
+channel = "general"
+tags = ["analysis"]
+
+# ── Server Connection ─────────────────────────────
+[server]
+url = "ws://localhost:3000/ws"
+api_url = "http://localhost:3000"
+reconnect_delay_ms = 2000
+max_reconnect_delay_ms = 15000
+max_reconnect_attempts = 5      # switch to HTTP after N failed WS reconnects
+http_poll_interval_ms = 3000    # poll frequency when in HTTP fallback mode
+bootstrap_history = 50          # fetch N recent messages on connect
+
+# ── LLM Provider ──────────────────────────────────
+# provider: "anthropic" | "openai" | "gemini" | "openai-compat"
+# openai-compat works with Ollama, vLLM, LM Studio, or any
+# OpenAI-compatible endpoint — set base_url accordingly.
+[llm]
+provider = "anthropic"
+model = "claude-sonnet-4-20250514"
+api_key_env = "LLM_API_KEY"    # env var name holding the key
+base_url = ""                   # override for openai-compat
+max_tokens = 1024
+temperature = 0.7
+
+# ── System Prompt ─────────────────────────────────
+# Uses {{VARIABLE}} tokens — resolved from [prompt.variables].
+[prompt]
+template = """
+You are {{NAME}}, a specialist in {{SPECIALIZATION}}. {{PERSONALITY}}
+You are participating in a multi-agent chat room. Keep your messages
+concise and collaborative. This is a hybrid team of AI agents and
+humans — encourage equal participation.
+"""
+
+[prompt.variables]
+NAME = "Analyst"
+SPECIALIZATION = "data analysis"
+PERSONALITY = "You are methodical, evidence-driven, and prefer concrete examples."
+
+# ── Context Window ────────────────────────────────
+[context]
+max_messages = 40               # sliding window for LLM context
+max_chars = 12000               # truncate context beyond this
+include_own_messages = true
+
+# ── Rate Limiting ─────────────────────────────────
+[limits.rate]
+min_delay_ms = 3000             # min time between outgoing messages
+max_per_minute = 10
+max_message_chars = 5000        # per outgoing message (server max is 10000)
+
+# ── Token Spend ───────────────────────────────────
+[limits.spend]
+max_input_tokens = 500000       # per session
+max_output_tokens = 50000
+
+# ── Message Count ─────────────────────────────────
+[limits.messages]
+max_sent = 200
+max_received = 500
+
+# ── Session End Conditions ────────────────────────
+[limits.session]
+max_duration_minutes = 60
+max_total_messages = 300
+end_keywords = ["session:end", "/end"]
+send_farewell = true
+farewell_message = "Session limit reached. Signing off."
+
+# ── Tools ─────────────────────────────────────────
+# Allow agents to invoke tools during conversation.
+# Tools are allow-listed per agent for governance.
+[tools]
+enabled = false
+allowed = []                    # empty = all tools; set to restrict, e.g. ["http-request", "read-file"]
+denied = []                     # explicitly block tools even if allowed is empty
+sandbox_dir = "./sandbox"
+max_tool_rounds = 5             # max consecutive tool calls per response
+announce_tool_use = true        # send "{Agent} is using {tool}" status messages
+
+# ── Reasoning Model Overrides ─────────────────────
+# Override LLM provider/model for thinking, analyzing, and reviewing tools.
+# Empty = use agent's primary LLM. Set to use a different model per task type.
+# Example: cheaper model for thinking, stronger for reviewing_work.
+[reasoning.thinking]
+provider = ""                   # "anthropic", "openai", "gemini", "openai-compat"
+model = ""                      # e.g. "claude-haiku-4-5-20251001" for fast thinking
+api_key_env = ""                # env var name, or empty to use agent's default
+max_tokens = 4096
+temperature = 0.3
+
+[reasoning.analyzing]
+provider = ""
+model = ""
+api_key_env = ""
+max_tokens = 4096
+temperature = 0.2
+
+[reasoning.reviewing_work]
+provider = ""
+model = ""
+api_key_env = ""
+max_tokens = 4096
+temperature = 0.2
+
+# ── Homelab Integrations ──────────────────────────
+# Configure URLs and credentials for homelab app tools.
+# Credentials use _env keys pointing to environment variable names.
+#
+# [integrations.calendar]
+# url = "http://localhost:3100"
+# email = "agent@homelab.local"
+# password_env = "CALENDAR_PASSWORD"
+#
+# [integrations.noted]
+# url = "http://localhost:3001"
+# username = "agent"
+# password_env = "NOTED_PASSWORD"
+#
+# [integrations.wiki]
+# url = "http://localhost:3002"
+# password_env = "WIKI_PASSWORD"
+#
+# [integrations.community_board]
+# url = "http://localhost:3003"
+# username = "agent"
+# password_env = "COMMUNITY_BOARD_PASSWORD"
+#
+# [integrations.git_host]
+# url = "http://localhost:3004"
+# token_env = "GIT_HOST_TOKEN"
+#
+# [integrations.rs_label]
+# binary_path = "rs-label"
+#
+# [integrations.asset_mapper]
+# url = "http://localhost:3005"
+#
+# [integrations.warehouse]
+# url = "http://localhost:3006"
+# email = "agent@homelab.local"
+# password_env = "WAREHOUSE_PASSWORD"
+#
+# [integrations.p_mail]
+# url = "http://localhost:3007"
+#
+# [integrations.vidiyo]
+# url = "http://localhost:3008"
+#
+# [integrations.yolodex]
+# url = "http://localhost:3009"
+# username = "agent"
+# password_env = "YOLODEX_PASSWORD"
+
+# ── Guardrails Proxy ──────────────────────────────
+# Route all LLM API calls through a guardrails proxy.
+[guardrails]
+enabled = false
+proxy_url = ""
+
+# ── Webhook Notifications ─────────────────────────
+# POST JSON to this URL on events.
+[webhooks]
+url = ""
+on_error = true
+on_limit_reached = true
+on_session_end = true

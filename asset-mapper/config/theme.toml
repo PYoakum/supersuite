@@ -1,0 +1,38 @@
+[colors]
+background       = "#0f1117"
+surface          = "#161b27"
+surface_elevated = "#1e2536"
+border           = "#2a3245"
+text_primary     = "#e2e8f0"
+text_secondary   = "#8b98b1"
+text_muted       = "#4a5568"
+accent           = "#4f8ef7"
+accent_hover     = "#6ba3ff"
+accent_dim       = "#1e3a6e"
+
+[status]
+active   = "#34d399"
+spare    = "#60a5fa"
+retired  = "#9ca3af"
+broken   = "#f87171"
+unknown  = "#d1d5db"
+
+[map]
+node_default  = "#2a3a5c"
+node_selected = "#4f8ef7"
+node_hover    = "#3a4f7a"
+node_retired  = "#374151"
+edge_default  = "#2a3245"
+edge_selected = "#4f8ef7"
+background    = "#0a0e17"
+
+[typography]
+font_stack = "'Inter', 'JetBrains Mono', 'SF Mono', 'Consolas', monospace"
+font_size_base = "13px"
+line_height = "1.6"
+
+[layout]
+panel_width    = "380px"
+topbar_height  = "48px"
+border_radius  = "4px"
+spacing_unit   = "8px"

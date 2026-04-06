@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>team-task</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="theme.js"></script>
+</head>
+<body>
+  <header>
+    <div class="header-top">
+      <h1>team-task</h1>
+      <div class="status-bar">
+        <a id="nav-chat" target="_blank" style="color:inherit;text-decoration:none;border:1px solid #333;padding:1px 6px;border-radius:3px;font-size:11px;">chat</a>
+        <a id="nav-teams" target="_blank" style="color:inherit;text-decoration:none;border:1px solid #333;padding:1px 6px;border-radius:3px;font-size:11px;">teams</a>
+        <script>
+          (function(){
+            var h = location.hostname;
+            document.getElementById("nav-chat").href = location.protocol+"//"+h+":3000";
+            document.getElementById("nav-teams").href = location.protocol+"//"+h+":3200";
+          })();
+        </script>
+        <span id="conn-status" class="conn disconnected">disconnected</span>
+        <span id="task-count">0 tasks</span>
+        <button class="theme-toggle" id="theme-toggle" onclick="cycleTheme()">SYS</button>
+      </div>
+    </div>
+    <nav class="tabs">
+      <button class="tab active" data-tab="tasks">Tasks</button>
+      <button class="tab" data-tab="visualize">Visualize</button>
+      <button class="tab" data-tab="import">Import</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- TASKS TAB -->
+    <section id="tasks-tab" class="tab-panel active">
+      <div class="toolbar">
+        <div class="filters">
+          <select id="filter-status">
+            <option value="">All Statuses</option>
+            <option value="todo">Todo</option>
+            <option value="in-progress">In Progress</option>
+            <option value="blocked">Blocked</option>
+            <option value="done">Done</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <select id="filter-priority">
+            <option value="">All Priorities</option>
+            <option value="critical">Critical</option>
+            <option value="high">High</option>
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+          </select>
+          <input type="text" id="filter-search" placeholder="Search tasks...">
+          <button id="btn-filter" class="btn">Filter</button>
+        </div>
+        <div class="toolbar-actions">
+          <button id="btn-export" class="btn">Export</button>
+          <button id="btn-clear" class="btn btn-danger">Clear All</button>
+          <button id="btn-new-task" class="btn btn-primary">+ New Task</button>
+        </div>
+      </div>
+
+      <!-- Create/Edit form (hidden by default) -->
+      <div id="task-form" class="task-form hidden">
+        <h3 id="form-title">New Task</h3>
+        <input type="hidden" id="form-task-id">
+        <div class="form-row">
+          <input type="text" id="form-name" placeholder="Task title" class="form-input-wide">
+        </div>
+        <div class="form-row">
+          <textarea id="form-desc" placeholder="Description (optional)" rows="2"></textarea>
+        </div>
+        <div class="form-row">
+          <select id="form-status">
+            <option value="todo">Todo</option>
+            <option value="in-progress">In Progress</option>
+            <option value="blocked">Blocked</option>
+            <option value="done">Done</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+          <select id="form-priority">
+            <option value="medium">Medium</option>
+            <option value="low">Low</option>
+            <option value="high">High</option>
+            <option value="critical">Critical</option>
+          </select>
+          <input type="text" id="form-assignee" placeholder="Assignee">
+          <input type="text" id="form-group" placeholder="Group">
+        </div>
+        <div class="form-row">
+          <label>Start <input type="date" id="form-start"></label>
+          <label>Due <input type="date" id="form-due"></label>
+          <input type="text" id="form-tags" placeholder="Tags (comma-separated)">
+          <input type="text" id="form-deps" placeholder="Dependencies (task IDs, comma-separated)">
+        </div>
+        <div class="form-actions">
+          <button id="btn-save-task" class="btn btn-primary">Save</button>
+          <button id="btn-cancel-task" class="btn">Cancel</button>
+        </div>
+      </div>
+
+      <div id="task-list" class="task-list"></div>
+    </section>
+
+    <!-- VISUALIZE TAB -->
+    <section id="visualize-tab" class="tab-panel">
+      <div class="viz-controls">
+        <select id="gantt-filter-group">
+          <option value="">All Groups</option>
+        </select>
+        <select id="gantt-filter-status">
+          <option value="">All Statuses</option>
+          <option value="todo">Todo</option>
+          <option value="in-progress">In Progress</option>
+          <option value="blocked">Blocked</option>
+          <option value="done">Done</option>
+          <option value="cancelled">Cancelled</option>
+        </select>
+      </div>
+      <h3>Gantt Chart</h3>
+      <div id="gantt-container" class="gantt-container"></div>
+      <h3>Tasks Completed Over Time</h3>
+      <canvas id="completion-chart" width="900" height="300"></canvas>
+    </section>
+
+    <!-- IMPORT TAB -->
+    <section id="import-tab" class="tab-panel">
+      <h3>Import Tasks</h3>
+      <p class="hint">Paste JSON or upload a .json file. Format: <code>{ "tasks": [ { "title": "...", ... } ] }</code></p>
+      <textarea id="import-json" rows="12" placeholder='{ "tasks": [ { "title": "Example task", "status": "todo", "priority": "high" } ] }'></textarea>
+      <div class="import-actions">
+        <label class="btn">
+          Upload File
+          <input type="file" id="import-file" accept=".json" hidden>
+        </label>
+        <button id="btn-import" class="btn btn-primary">Import</button>
+      </div>
+      <div id="import-result" class="import-result hidden"></div>
+    </section>
+  </main>
+
+  <!-- Task Detail Panel -->
+  <div id="task-detail" class="task-detail task-detail-hidden">
+    <div class="detail-header">
+      <h2 id="detail-title"></h2>
+      <button id="detail-close" class="btn btn-sm">&times;</button>
+    </div>
+    <div class="detail-body">
+      <div class="detail-meta" id="detail-meta"></div>
+      <div class="detail-section">
+        <h3>Description</h3>
+        <div id="detail-description" class="detail-description"></div>
+      </div>
+      <div class="detail-section">
+        <h3>Token Usage</h3>
+        <div id="detail-tokens" class="detail-tokens"></div>
+      </div>
+      <div class="detail-section">
+        <h3>Status History</h3>
+        <div id="detail-history" class="status-timeline"></div>
+      </div>
+      <div class="detail-section">
+        <h3>Timestamps</h3>
+        <div id="detail-timestamps"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <script src="websocket.js"></script>
+  <script src="tasks.js"></script>
+  <script src="gantt.js"></script>
+  <script src="chart.js"></script>
+  <script src="import.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

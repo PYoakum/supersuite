@@ -1,0 +1,12 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "paths": {
+      "@calendar/ui": ["../../packages/ui/src/index.ts"],
+      "@calendar/types": ["../../packages/types/index.ts"],
+      "@calendar/shared-utils": ["../../packages/shared-utils/index.ts"]
+    }
+  },
+  "include": ["src", "../../packages/ui/src"]
+}

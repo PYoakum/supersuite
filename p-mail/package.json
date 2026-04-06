@@ -1,0 +1,15 @@
+{
+  "name": "p-mail",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "bun run --watch server.js",
+    "demo": "bun run demo.js"
+  },
+  "dependencies": {
+    "imapflow": "^1.0.171",
+    "mailparser": "^3.7.2",
+    "nodemailer": "^6.9.16",
+    "smol-toml": "^1.3.1"
+  }
+}

@@ -1,0 +1,49 @@
+appId: com.calendar.desktop
+productName: Calendar
+copyright: Copyright © 2026
+directories:
+  output: release
+  buildResources: resources
+files:
+  - dist/**/*
+  - package.json
+asar: true
+compression: maximum
+
+mac:
+  category: public.app-category.productivity
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+  darkModeSupport: true
+  hardenedRuntime: true
+  entitlements: resources/entitlements.mac.plist
+  entitlementsInherit: resources/entitlements.mac.plist
+
+dmg:
+  artifactName: Calendar-${version}-${arch}.dmg
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  publisherName: Calendar
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  artifactName: Calendar-Setup-${version}.exe
+
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - x64
+    - target: deb
+      arch:
+        - x64
+  category: Office
+  artifactName: Calendar-${version}-${arch}.${ext}

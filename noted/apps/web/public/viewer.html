@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="page-title">Noted — Document</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    .viewer-header {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .viewer-header h1 { margin: 0 0 0.25rem 0; font-size: 1.6rem; }
+    .viewer-meta { font-size: 0.8rem; color: var(--text-muted); }
+    .viewer-content {
+      line-height: 1.75;
+      font-size: 1rem;
+    }
+    .viewer-content h1 { font-size: 1.5rem; margin: 1.5rem 0 0.75rem; }
+    .viewer-content h2 { font-size: 1.3rem; margin: 1.3rem 0 0.65rem; }
+    .viewer-content h3 { font-size: 1.15rem; margin: 1.2rem 0 0.6rem; }
+    .viewer-content pre {
+      background: #f5f5f4;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      overflow-x: auto;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+    }
+    .viewer-content code {
+      font-family: var(--mono);
+      font-size: 0.88em;
+      background: #f5f5f4;
+      padding: 0.15em 0.35em;
+      border-radius: 3px;
+    }
+    .viewer-content pre code { background: none; padding: 0; }
+    .viewer-content blockquote {
+      border-left: 3px solid var(--border);
+      margin: 1rem 0;
+      padding: 0.5rem 1rem;
+      color: var(--text-muted);
+    }
+    .viewer-content table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 1rem 0;
+    }
+    .viewer-content th, .viewer-content td {
+      border: 1px solid var(--border);
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+    .viewer-content th { background: #f5f5f4; font-weight: 600; }
+    .viewer-content img { max-width: 100%; border-radius: var(--radius); }
+    .viewer-content ul, .viewer-content ol { padding-left: 1.5rem; }
+    .viewer-content li { margin-bottom: 0.25rem; }
+    .viewer-content input[type="checkbox"] { margin-right: 0.5rem; }
+    .viewer-content hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+
+    /* Task list */
+    .viewer-content .task-list { list-style: none; padding-left: 0.5rem; }
+    .viewer-content .task-item input[type="checkbox"] { margin-right: 0.4rem; vertical-align: middle; }
+
+    /* Table of contents */
+    .viewer-content .toc {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.25rem;
+      margin: 1rem 0;
+    }
+    .viewer-content .toc ul { list-style: none; padding-left: 0; margin: 0; }
+    .viewer-content .toc li { margin: 0.2rem 0; }
+    .viewer-content .toc .toc-h2 { padding-left: 1rem; }
+    .viewer-content .toc .toc-h3 { padding-left: 2rem; }
+    .viewer-content .toc .toc-h4 { padding-left: 3rem; }
+    .viewer-content .toc a { font-size: 0.9rem; }
+
+    /* Callout directive */
+    .viewer-content .callout {
+      border-left: 4px solid var(--accent);
+      background: #eff6ff;
+      padding: 0.75rem 1rem;
+      margin: 1rem 0;
+      border-radius: 0 var(--radius) var(--radius) 0;
+    }
+    .viewer-content .callout-warning { border-left-color: #f59e0b; background: #fffbeb; }
+    .viewer-content .callout-danger, .viewer-content .callout-error { border-left-color: var(--danger); background: #fef2f2; }
+    .viewer-content .callout-success { border-left-color: var(--success); background: #f0fdf4; }
+    .viewer-content .callout-title { font-weight: 600; margin-bottom: 0.3rem; }
+
+    /* Wiki links */
+    .viewer-content .wiki-link { color: var(--accent); border-bottom: 1px dashed var(--accent); }
+    .viewer-content .wiki-link:hover { border-bottom-style: solid; }
+    .error-state { text-align: center; padding: 3rem; color: var(--text-muted); }
+    .edit-link { font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <a href="/" class="nav-brand">Noted</a>
+    <div class="nav-links">
+      <a href="/" id="nav-dashboard" style="display:none;">Documents</a>
+      <a href="/login" id="nav-login">Sign in</a>
+    </div>
+  </nav>
+
+  <div class="container" id="viewer-container">
+    <div class="error-state" id="loading">Loading…</div>
+  </div>
+
+  <script src="/app.js"></script>
+  <script>
+    const slug = window.location.pathname.replace(/^\/d\//, '');
+
+    async function init() {
+      // Check auth status (optional, for nav)
+      try {
+        const me = await api.get('/api/me');
+        if (me.user) {
+          document.getElementById('nav-dashboard').style.display = '';
+          document.getElementById('nav-login').style.display = 'none';
+        }
+      } catch {}
+
+      await loadDocument();
+    }
+
+    async function loadDocument() {
+      const container = document.getElementById('viewer-container');
+      try {
+        const res = await fetch(`/api/docs/${encodeURIComponent(slug)}`, { credentials: 'same-origin' });
+        const data = await res.json();
+
+        // Handle redirect
+        if (res.status === 301 && data.redirect) {
+          window.location.href = `/d/${data.slug}`;
+          return;
+        }
+
+        if (!res.ok) {
+          container.innerHTML = `<div class="error-state">${
+            res.status === 404 ? 'Document not found.' :
+            res.status === 403 ? 'This document is private.' :
+            data.error || 'Failed to load document.'
+          }</div>`;
+          return;
+        }
+
+        const doc = data.document;
+        document.getElementById('page-title').textContent = `${doc.title} — Noted`;
+
+        const date = new Date(doc.updated_at).toLocaleDateString('en-US', {
+          year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        // Use server-rendered HTML (sanitized)
+        const html = doc.content_html || '<p class="text-muted">Empty document.</p>';
+
+        container.innerHTML = `
+          <div class="viewer-header">
+            <h1>${escapeHtml(doc.title)}</h1>
+            <div class="viewer-meta">
+              Last updated ${date}
+              ${doc.is_public ? ' · Public' : ''}
+            </div>
+          </div>
+          <div class="viewer-content">${html}</div>
+        `;
+      } catch (err) {
+        container.innerHTML = `<div class="error-state">Failed to load document.</div>`;
+      }
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    init();
+  </script>
+</body>
+</html>

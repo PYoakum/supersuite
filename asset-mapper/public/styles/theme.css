@@ -1,0 +1,37 @@
+/* public/styles/theme.css — CSS variables; populated at runtime from /api/config/theme */
+:root {
+  /* Fallback defaults (overwritten by JS after theme loads) */
+  --color-background:       #0f1117;
+  --color-surface:          #161b27;
+  --color-surface-elevated: #1e2536;
+  --color-border:           #2a3245;
+  --color-text-primary:     #e2e8f0;
+  --color-text-secondary:   #8b98b1;
+  --color-text-muted:       #4a5568;
+  --color-accent:           #4f8ef7;
+  --color-accent-hover:     #6ba3ff;
+  --color-accent-dim:       #1e3a6e;
+
+  --status-active:   #34d399;
+  --status-spare:    #60a5fa;
+  --status-retired:  #9ca3af;
+  --status-broken:   #f87171;
+  --status-unknown:  #d1d5db;
+
+  --color-map-bg:       #0a0e17;
+  --color-node-default: #2a3a5c;
+  --color-node-selected:#4f8ef7;
+  --color-node-hover:   #3a4f7a;
+  --color-node-retired: #374151;
+  --color-edge-default: #2a3245;
+  --color-edge-selected:#4f8ef7;
+
+  --font-stack:       'Inter', 'JetBrains Mono', monospace;
+  --font-size-base:   13px;
+  --line-height:      1.6;
+
+  --panel-width:    380px;
+  --topbar-height:  48px;
+  --border-radius:  4px;
+  --spacing-unit:   8px;
+}

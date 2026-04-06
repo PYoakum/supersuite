@@ -1,0 +1,8 @@
+{
+  "name": "team-task",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "bun run src/server.ts",
+    "dev": "bun --watch run src/server.ts"
+  }
+}

@@ -1,0 +1,46 @@
+# Noted — Configuration
+# Copy to config.toml and adjust values for your environment.
+
+[server]
+host = "0.0.0.0"
+port = 3000
+public_url = "http://localhost:3000"
+
+[database]
+host = "127.0.0.1"
+port = 5432
+name = "noted"
+user = "noted"
+password = "noted"
+# max pool connections
+pool_max = 10
+# require SSL (recommended for non-localhost)
+ssl = false
+
+[auth]
+# session cookie name
+cookie_name = "noted_sid"
+# session lifetime in seconds (default 30 days)
+session_max_age = 2592000
+# bcrypt / argon2id
+password_algorithm = "argon2id"
+
+[storage]
+# local file path for uploaded media
+media_path = "./data/media"
+
+[features]
+# allow public (unauthenticated) document viewing
+public_sharing = true
+# allow new user registration
+open_registration = true
+
+[editor]
+# autosave debounce in milliseconds
+autosave_debounce_ms = 800
+
+[slugs]
+# automatically create redirects when title changes
+auto_redirects = true
+# max slug length
+max_length = 200

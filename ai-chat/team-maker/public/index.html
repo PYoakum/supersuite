@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>team-maker</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/theme.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header>
+      <div>
+        <span class="logo">team-maker</span>
+        <span class="subtitle"> / plan decomposition</span>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <a id="nav-chat" class="nav-link" target="_blank">chat</a>
+        <a id="nav-tasks" class="nav-link" target="_blank">tasks</a>
+        <a href="/api/health" class="nav-link" target="_blank">health</a>
+          <button class="theme-toggle" id="theme-toggle" onclick="cycleTheme()">SYS</button>
+        <script>
+          (function(){
+            var h = location.hostname;
+            document.getElementById("nav-chat").href = location.protocol+"//"+h+":3000";
+            document.getElementById("nav-tasks").href = location.protocol+"//"+h+":3001";
+          })();
+        </script>
+      </div>
+    </header>
+
+    <!-- Input Panel -->
+    <div id="input-panel">
+      <div class="form-section">
+        <h2>Project Plan</h2>
+        <textarea
+          class="plan-input"
+          id="plan-input"
+          placeholder="Paste your project plan here (markdown, plain text, or JSON)..."
+        ></textarea>
+        <div class="file-drop" id="file-drop">
+          Drop a file here or click to upload (.md, .txt, .json)
+          <input type="file" id="file-input" accept=".md,.txt,.json,.markdown" hidden>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h2>Configuration</h2>
+        <div class="config-grid">
+          <div class="config-field">
+            <label for="ai-count">AI Agents</label>
+            <input type="number" id="ai-count" value="3" min="0" max="20">
+          </div>
+          <div class="config-field">
+            <label for="human-count">Human Members</label>
+            <input type="number" id="human-count" value="2" min="0" max="20">
+          </div>
+          <div class="config-field">
+            <label for="provider">Provider</label>
+            <select id="provider">
+              <option value="anthropic">Anthropic</option>
+              <option value="openai">OpenAI</option>
+              <option value="gemini">Gemini</option>
+              <option value="openai-compat">OpenAI-compat</option>
+            </select>
+          </div>
+          <div class="config-field">
+            <label for="model">Model</label>
+            <input type="text" id="model" placeholder="default from server">
+          </div>
+          <div class="config-field">
+            <label for="prompt-style">Prompt Style</label>
+            <select id="prompt-style">
+              <option value="concise">Concise</option>
+              <option value="detailed">Detailed</option>
+            </select>
+          </div>
+          <div class="config-field">
+            <label for="strategy">Strategy</label>
+            <select id="strategy">
+              <option value="balanced">Balanced</option>
+              <option value="specialized">Specialized</option>
+            </select>
+          </div>
+        </div>
+        <div style="display: flex; gap: 20px; margin-top: 10px;">
+          <div class="checkbox-field">
+            <input type="checkbox" id="include-risks" checked>
+            <label for="include-risks">Include risks</label>
+          </div>
+          <div class="checkbox-field">
+            <input type="checkbox" id="include-deps" checked>
+            <label for="include-deps">Include dependencies</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn" id="evaluate-btn">Evaluate Plan</button>
+        <button class="btn btn-secondary" id="import-btn">Import Result</button>
+        <button class="btn btn-secondary" id="import-agents-btn">Import Agents</button>
+        <button class="btn btn-secondary" id="create-agent-toggle">+ Create Agent</button>
+        <input type="file" id="import-input" accept=".json" hidden>
+      </div>
+
+      <!-- Quick Create Agent Form -->
+      <div id="create-agent-form" class="form-section" style="display:none;">
+        <h2>Create Agent (no evaluation needed)</h2>
+        <div class="config-grid">
+          <div class="config-field">
+            <label for="ca-name">Name</label>
+            <input type="text" id="ca-name" placeholder="e.g. Maya">
+          </div>
+          <div class="config-field">
+            <label for="ca-role">Role</label>
+            <input type="text" id="ca-role" placeholder="e.g. frontend developer">
+          </div>
+          <div class="config-field">
+            <label for="ca-type">Type</label>
+            <select id="ca-type">
+              <option value="worker">Worker</option>
+              <option value="pm">PM</option>
+              <option value="recruiter">Recruiter</option>
+            </select>
+          </div>
+          <div class="config-field">
+            <label for="ca-model">Model</label>
+            <input type="text" id="ca-model" placeholder="claude-sonnet-4-20250514">
+          </div>
+        </div>
+        <div class="config-field" style="margin-top:8px;">
+          <label for="ca-focus">Focus / Assignment</label>
+          <textarea id="ca-focus" rows="3" placeholder="Describe what this agent should work on..."></textarea>
+        </div>
+        <div class="config-field" style="margin-top:8px;">
+          <label>Skills <span style="opacity:0.5;font-size:0.85em;">(click to toggle)</span></label>
+          <div id="ca-skills" class="ca-chip-grid"></div>
+        </div>
+        <div class="config-field" style="margin-top:8px;">
+          <label>Tools <span style="opacity:0.5;font-size:0.85em;">(click to toggle)</span></label>
+          <div id="ca-tools" class="ca-chip-grid"></div>
+        </div>
+        <div class="btn-row" style="margin-top:8px;">
+          <button class="btn" id="ca-submit">Create &amp; Launch</button>
+          <button class="btn btn-secondary" id="ca-cancel">Cancel</button>
+        </div>
+        <div class="error-msg" id="ca-error"></div>
+      </div>
+
+      <!-- Active Agents Panel -->
+      <div class="form-section" id="active-agents-section">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <h2>Active Agents</h2>
+          <button class="btn btn-secondary" id="sync-agents-btn" style="font-size:0.8em;padding:3px 8px;">Sync</button>
+        </div>
+        <div id="active-agents-list" class="active-agents-list">
+          <span style="opacity:0.5;">No agents running</span>
+        </div>
+      </div>
+
+      <div class="agent-picker" id="agent-picker" style="display:none;">
+        <div class="form-section">
+          <h2>Available Agent Configs</h2>
+          <div id="agent-picker-list"></div>
+          <div class="btn-row">
+            <button class="btn" id="import-selected-btn">Import Selected</button>
+            <button class="btn btn-secondary" id="cancel-picker-btn">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="error-msg" id="error-msg"></div>
+
+      <div class="loading" id="loading">
+        <span class="spinner"></span>
+        <span id="loading-text">Evaluating plan...</span>
+      </div>
+
+      <div class="stream-preview" id="stream-preview">
+        <div class="stream-header">
+          <span>LLM Response</span>
+          <span class="stream-chars" id="stream-chars"></span>
+        </div>
+        <pre class="stream-body" id="stream-body"></pre>
+      </div>
+    </div>
+
+    <!-- Results Panel -->
+    <div id="results-panel">
+      <div class="results-header">
+        <h2>Results</h2>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <button class="btn-secondary btn" id="back-btn">Back</button>
+          <button class="btn-secondary btn" id="export-json-btn">Export JSON</button>
+          <button class="btn-secondary btn" id="export-md-btn">Export Markdown</button>
+          <button class="btn dispatch-btn" id="send-all-chat-btn">Send All to Chat</button>
+          <button class="btn dispatch-btn" id="send-all-tasks-btn">Send All to Tasks</button>
+          <button class="btn launch-all-btn" id="launch-all-btn">Launch All Agents</button>
+          <button class="btn launch-all-btn" id="stop-all-btn" style="display:none">Stop All Agents</button>
+        </div>
+      </div>
+      <div class="dispatch-status" id="dispatch-status"></div>
+
+      <div class="summary-card" id="summary"></div>
+
+      <div class="usage" id="usage"></div>
+
+      <div class="section-title">Tasks</div>
+      <div class="form-section" id="tasks-list"></div>
+
+      <div class="section-title">Assignments</div>
+      <div id="assignments-list"></div>
+
+      <div class="section-title collapsible open" id="skills-toggle">
+        <span class="collapse-arrow">&#9654;</span> Skills
+        <span class="collapse-hint" id="skills-hint"></span>
+      </div>
+      <div class="form-section collapsible-body" id="skills-section">
+        <p style="margin:0 0 8px;opacity:0.7;">Assign skill files (.md) to roles. Place files in the <code>skills/</code> directory.</p>
+        <div class="section-subtitle">Available Skills</div>
+        <div id="skills-available"></div>
+        <div class="section-subtitle" style="margin-top:14px;">Role Assignments</div>
+        <div id="skills-assign-list"></div>
+        <div class="btn-row" style="margin-top:10px;">
+          <button class="btn" id="apply-skills-btn">Apply Skills</button>
+        </div>
+        <div class="dispatch-status" id="skills-status"></div>
+      </div>
+
+      <div class="section-title collapsible open" id="tools-toggle">
+        <span class="collapse-arrow">&#9654;</span> Tools
+        <span class="collapse-hint" id="tools-hint"></span>
+      </div>
+      <div class="form-section collapsible-body" id="tools-section">
+        <p style="margin:0 0 8px;opacity:0.7;">Assign tools to AI roles. Agents use these to execute code, read files, make HTTP requests, etc.</p>
+        <div class="section-subtitle">Available Tools</div>
+        <div id="tools-available" class="skills-available"></div>
+        <div class="section-subtitle" style="margin-top:14px;">Role Assignments</div>
+        <div id="tools-assign-list"></div>
+        <div class="btn-row" style="margin-top:10px;">
+          <button class="btn" id="apply-tools-btn">Apply Tools</button>
+          <button class="btn btn-secondary" id="tools-select-all-btn">Select All</button>
+          <button class="btn btn-secondary" id="tools-clear-btn">Clear All</button>
+        </div>
+        <div class="dispatch-status" id="tools-status"></div>
+      </div>
+
+      <div class="section-title">Model Assignment</div>
+      <div class="form-section" id="model-assignment">
+        <p style="margin:0 0 8px;opacity:0.7;">Set the LLM provider and model for each AI role, then apply.</p>
+        <div id="role-llm-list"></div>
+        <div class="btn-row" style="margin-top:10px;">
+          <button class="btn" id="apply-models-btn">Apply Models</button>
+        </div>
+        <div class="error-msg" id="model-error-msg"></div>
+      </div>
+
+      <div class="section-title">Generated Prompts</div>
+      <div id="prompts-list"></div>
+
+      <div id="ambiguities-section" style="display:none;">
+        <div class="section-title">Ambiguities</div>
+        <div class="summary-card" id="ambiguities-list"></div>
+      </div>
+
+      <div id="validation-warnings"></div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

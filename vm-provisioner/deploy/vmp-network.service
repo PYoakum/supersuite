@@ -1,0 +1,17 @@
+[Unit]
+Description=vm-provisioner network infrastructure
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+EnvironmentFile=/opt/vm-provisioner/deploy/vmp.env
+ExecStart=/opt/vm-provisioner/setup-network.sh \
+  --tap-count ${TAP_COUNT} --bridge-name ${BRIDGE_NAME} \
+  --subnet ${SUBNET} --bridge-ip ${BRIDGE_IP} \
+  --dhcp-range-start ${DHCP_RANGE_START} --dhcp-range-end ${DHCP_RANGE_END}
+ExecStop=/opt/vm-provisioner/teardown-network.sh
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,9 @@
+{
+  "name": "@noted/shared",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./src/index.js",
+  "scripts": {
+    "build": "echo 'no build step for shared (pure JS)'"
+  }
+}

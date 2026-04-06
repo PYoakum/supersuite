@@ -1,0 +1,21 @@
+[server]
+port = 3000
+host = "0.0.0.0"
+
+[storage]
+# Directory for uploaded media files (relative to project root)
+uploads_dir = "data/uploads"
+# Directory for rendered output files
+output_dir = "data/output"
+# Directory for project JSON files
+projects_dir = "data/projects"
+# Directory for generated thumbnails
+thumbnails_dir = "data/thumbnails"
+# Max upload size in MB
+max_upload_mb = 500
+
+[ffmpeg]
+# Path to ffmpeg binary (leave empty to use system PATH)
+ffmpeg_path = ""
+# Path to ffprobe binary (leave empty to use system PATH)
+ffprobe_path = ""

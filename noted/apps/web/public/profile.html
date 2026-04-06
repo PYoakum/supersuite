@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Noted — Profile</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <nav class="nav">
+    <a href="/" class="nav-brand">Noted</a>
+    <div class="nav-links">
+      <a href="/">Documents</a>
+      <a href="#" id="logout-link">Sign out</a>
+    </div>
+  </nav>
+
+  <div class="container-narrow" style="margin-top: 2rem;">
+    <h1 style="font-size: 1.3rem; margin-bottom: 1.5rem;">Profile</h1>
+
+    <div class="card">
+      <div id="alert" class="hidden"></div>
+
+      <form id="profile-form">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" disabled style="background:var(--bg); color:var(--text-muted);">
+        </div>
+
+        <div class="form-group">
+          <label for="displayName">Display Name</label>
+          <input type="text" id="displayName" name="displayName" maxlength="100">
+        </div>
+
+        <div class="form-group">
+          <label>Role</label>
+          <input type="text" id="role" disabled style="background:var(--bg); color:var(--text-muted);">
+        </div>
+
+        <button type="submit" id="save-btn" class="btn btn-primary btn-block">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+  <script>
+    async function init() {
+      const user = await requireLogin();
+      if (!user) return;
+
+      document.getElementById('email').value = user.email;
+      document.getElementById('displayName').value = user.displayName || '';
+      document.getElementById('role').value = user.role;
+    }
+
+    document.getElementById('profile-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideAlert('alert');
+
+      const btn = document.getElementById('save-btn');
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+
+      try {
+        const displayName = document.getElementById('displayName').value;
+        await api.put('/api/me', { displayName });
+        showSuccess('alert', 'Profile updated.');
+      } catch (err) {
+        showError('alert', err.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save Changes';
+      }
+    });
+
+    document.getElementById('logout-link').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await api.post('/api/auth/logout');
+      window.location.href = '/login';
+    });
+
+    init();
+  </script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>agent-chat // supervision console</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/theme.js"></script>
+</head>
+<body>
+  <header id="header">
+    <div class="header-left">
+      <span class="logo">▸ agent-chat</span>
+      <span class="channel" id="channel-name">#general</span>
+      <a href="/prompt-builder.html" class="nav-link" title="Prompt Builder">prompts</a>
+      <a id="nav-teams" class="nav-link" target="_blank" title="Team Maker">teams</a>
+      <a id="nav-tasks" class="nav-link" target="_blank" title="Task Board">tasks</a>
+      <script>
+        (function(){
+          var h = location.hostname;
+          document.getElementById("nav-teams").href = location.protocol+"//"+h+":3200";
+          document.getElementById("nav-tasks").href = location.protocol+"//"+h+":3001";
+        })();
+      </script>
+    </div>
+    <div class="header-right">
+      <span class="stat" id="msg-count" title="Total messages">0 msgs</span>
+      <span class="stat" id="client-count" title="Connected clients">—</span>
+      <span class="status-dot" id="status-dot"></span>
+      <span class="status-text" id="status-text">connecting</span>
+      <button class="theme-toggle" id="theme-toggle" onclick="cycleTheme()" title="Theme">SYS</button>
+    </div>
+  </header>
+
+  <main id="main">
+    <div id="log-viewport">
+      <button id="load-more" class="load-more-btn" style="display:none;">▲ load older messages</button>
+      <div id="messages"></div>
+      <div id="scroll-anchor"></div>
+    </div>
+
+    <aside id="search-panel" class="hidden">
+      <div class="search-header">
+        <span>search</span>
+        <button id="search-close" class="icon-btn" title="Close search">✕</button>
+      </div>
+      <div class="search-controls">
+        <input type="text" id="search-q" placeholder="search text…" autocomplete="off">
+        <input type="text" id="search-sender" placeholder="sender id…" autocomplete="off">
+        <div class="search-row">
+          <input type="date" id="search-after" title="After date">
+          <input type="date" id="search-before" title="Before date">
+        </div>
+        <button id="search-go" class="action-btn">search</button>
+      </div>
+      <div id="search-results"></div>
+    </aside>
+
+    <aside id="export-panel" class="hidden">
+      <div class="panel-header">
+        <span>export to endpoint</span>
+        <button id="export-panel-close" class="icon-btn" title="Close panel">✕</button>
+      </div>
+      <div class="panel-controls">
+        <label for="export-endpoint">endpoint</label>
+        <input type="text" id="export-endpoint" placeholder="https://api.example.com/ingest" autocomplete="off">
+
+        <div class="panel-row">
+          <div class="panel-field">
+            <label for="export-method">method</label>
+            <select id="export-method">
+              <option value="POST">POST</option>
+              <option value="PUT">PUT</option>
+            </select>
+          </div>
+          <div class="panel-field">
+            <label for="export-format">format</label>
+            <select id="export-format">
+              <option value="json">JSON (prompt + messages)</option>
+              <option value="text">Text (prompt + log)</option>
+              <option value="openai">OpenAI messages</option>
+            </select>
+          </div>
+        </div>
+
+        <label for="export-prompt">prompt</label>
+        <textarea id="export-prompt" rows="4" placeholder="Optional prompt or instructions to include with the chat log…"></textarea>
+
+        <button id="export-send" class="action-btn">send</button>
+        <div id="export-status" class="export-status"></div>
+      </div>
+    </aside>
+  </main>
+
+  <footer id="composer">
+    <div class="composer-row">
+      <select id="sender-type" title="Sender type">
+        <option value="human">human</option>
+        <option value="agent">agent</option>
+        <option value="system">system</option>
+      </select>
+      <input type="text" id="sender-id" placeholder="your-id" value="supervisor" autocomplete="off">
+      <input type="text" id="display-name" placeholder="Display Name" value="Supervisor" autocomplete="off">
+    </div>
+    <div class="composer-input-row">
+      <input type="text" id="msg-input" placeholder="Type a message…" autocomplete="off" autofocus>
+      <button id="export-btn" class="icon-btn" title="Export chat log">↓</button>
+      <button id="clear-btn" class="icon-btn destructive" title="Clear chat history">✕</button>
+      <button id="export-panel-toggle" class="icon-btn" title="Export to endpoint">⇗</button>
+      <button id="search-toggle" class="icon-btn" title="Toggle search">⌕</button>
+      <button id="send-btn" class="action-btn">send</button>
+    </div>
+  </footer>
+
+  <script src="/app.js" type="module"></script>
+</body>
+</html>

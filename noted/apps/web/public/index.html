@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Noted — Dashboard</title>
+  <link rel="stylesheet" href="/styles.css">
+  <style>
+    body { overflow: hidden; }
+    .layout { display: flex; height: calc(100vh - 48px); }
+
+    /* ─── Sidebar ─────────────────── */
+    .sidebar {
+      width: 220px;
+      min-width: 220px;
+      border-right: 1px solid var(--border);
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .sidebar-section { padding: 0.75rem 0.75rem 0.25rem; }
+    .sidebar-heading {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .sidebar-heading button {
+      background: none; border: none; cursor: pointer;
+      font-size: 0.85rem; color: var(--text-muted); padding: 0 0.2rem;
+      border-radius: 3px;
+    }
+    .sidebar-heading button:hover { background: var(--border); }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 0.4rem;
+      padding: 0.3rem 0.5rem; border-radius: var(--radius);
+      cursor: pointer; font-size: 0.85rem; color: var(--text);
+      text-decoration: none; transition: background 0.08s;
+    }
+    .sidebar-item:hover { background: var(--bg-card); }
+    .sidebar-item.active { background: var(--bg-card); font-weight: 600; }
+    .sidebar-item .count {
+      margin-left: auto; font-size: 0.72rem;
+      color: var(--text-muted); min-width: 1.2rem; text-align: right;
+    }
+    .folder-icon { font-size: 0.9rem; }
+    .sidebar-sep { border-top: 1px solid var(--border); margin: 0.5rem 0.75rem; }
+
+    /* ─── Tags ─────────────────── */
+    .tag-pill {
+      display: inline-flex; align-items: center; gap: 0.2rem;
+      font-size: 0.7rem; padding: 0.1rem 0.4rem;
+      border-radius: 9px; cursor: pointer;
+      border: 1px solid transparent; transition: all 0.08s;
+    }
+    .tag-pill.active { border-color: currentColor; font-weight: 600; }
+    .tag-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .sidebar-tags { display: flex; flex-wrap: wrap; gap: 0.25rem; padding: 0.1rem 0.5rem; }
+
+    /* ─── Main Content ─────────────── */
+    .main { flex: 1; overflow-y: auto; }
+    .main-inner { max-width: 780px; margin: 0 auto; padding: 1.5rem; }
+    .header-row {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 1rem;
+    }
+    .header-left { display: flex; align-items: center; gap: 0.75rem; }
+    .header-left h1 { margin: 0; font-size: 1.2rem; }
+    .sort-select {
+      font-size: 0.78rem; border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 0.2rem 0.4rem;
+      background: var(--bg-card); color: var(--text-muted); cursor: pointer;
+    }
+    .search-bar { margin-bottom: 1rem; }
+    .search-input {
+      width: 100%; padding: 0.5rem 0.75rem;
+      border: 1px solid var(--border); border-radius: var(--radius);
+      font-size: 0.9rem; font-family: var(--font);
+      outline: none; background: var(--bg);
+    }
+    .search-input:focus { border-color: var(--accent); }
+
+    /* ─── Doc List ─────────────────── */
+    .doc-list { list-style: none; padding: 0; margin: 0; }
+    .doc-item {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding: 0.65rem 0; border-bottom: 1px solid var(--border);
+    }
+    .doc-item:last-child { border-bottom: none; }
+    .doc-title { font-weight: 500; }
+    .doc-title a { color: var(--text); text-decoration: none; }
+    .doc-title a:hover { color: var(--accent); }
+    .doc-meta { font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.15rem; }
+    .doc-tags { display: inline-flex; gap: 0.2rem; }
+    .doc-tag {
+      font-size: 0.65rem; padding: 0.05rem 0.35rem;
+      border-radius: 8px; background: #f5f5f4; color: #57534e;
+    }
+    .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); }
+
+    /* ─── Search Results ─────────── */
+    .search-results { margin-bottom: 1rem; }
+    .search-result { padding: 0.5rem 0; border-bottom: 1px solid var(--border); }
+    .search-result:last-child { border-bottom: none; }
+    .search-result-title { font-weight: 500; }
+    .search-result-title a { color: var(--text); text-decoration: none; }
+    .search-result-title a:hover { color: var(--accent); }
+    .search-result-snippet { font-size: 0.83rem; color: var(--text-muted); margin-top: 0.1rem; }
+    .search-result-snippet mark { background: #fef08a; padding: 0 0.1rem; border-radius: 2px; }
+    .search-meta { font-size: 0.76rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <a href="/" class="nav-brand">Noted</a>
+    <div class="nav-links">
+      <a href="/profile">Profile</a>
+      <a href="#" id="logout-link">Sign out</a>
+    </div>
+  </nav>
+
+  <div class="layout">
+    <!-- ─── Sidebar ────────────────────────── -->
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-item active" data-filter="all" id="filter-all">
+          <span>📄</span> All Documents <span class="count" id="count-all">0</span>
+        </div>
+        <div class="sidebar-item" data-filter="public" id="filter-public">
+          <span>🌐</span> Public <span class="count" id="count-public">0</span>
+        </div>
+      </div>
+
+      <div class="sidebar-sep"></div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-heading">
+          Folders
+          <button id="add-folder-btn" title="New folder">+</button>
+        </div>
+        <div id="folder-list"></div>
+      </div>
+
+      <div class="sidebar-sep"></div>
+
+      <div class="sidebar-section">
+        <div class="sidebar-heading">
+          Tags
+          <button id="add-tag-btn" title="New tag">+</button>
+        </div>
+        <div class="sidebar-tags" id="tag-list"></div>
+      </div>
+    </div>
+
+    <!-- ─── Main ───────────────────────────── -->
+    <div class="main">
+      <div class="main-inner">
+        <div class="header-row">
+          <div class="header-left">
+            <h1 id="view-title">All Documents</h1>
+            <select class="sort-select" id="sort-select">
+              <option value="updated">Recently edited</option>
+              <option value="created">Newest first</option>
+              <option value="title">Title A–Z</option>
+            </select>
+          </div>
+          <button id="new-doc-btn" class="btn btn-primary">New Document</button>
+        </div>
+
+        <div class="search-bar">
+          <input type="text" id="search-input" class="search-input" placeholder="Search documents…" autocomplete="off">
+        </div>
+        <div id="search-results" class="search-results" style="display:none;"></div>
+
+        <div class="card">
+          <div id="doc-list-container">
+            <div class="empty-state">Loading…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+  <script>
+    let currentUser = null;
+    let allDocs = [];
+    let allTags = [];
+    let allFolders = [];
+    let docTagMap = {}; // docId → [tag, ...]
+    let activeFilter = 'all'; // 'all', 'public', 'folder:id', 'tag:name'
+    let activeTagFilter = null;
+    let sortBy = 'updated';
+
+    async function init() {
+      currentUser = await requireLogin();
+      if (!currentUser) return;
+      await Promise.all([loadDocuments(), loadFolders(), loadTags()]);
+      renderDocList();
+    }
+
+    // ─── Data Loading ──────────────────────
+
+    async function loadDocuments() {
+      try {
+        const data = await api.get('/api/docs');
+        allDocs = data.documents || [];
+        document.getElementById('count-all').textContent = allDocs.length;
+        document.getElementById('count-public').textContent = allDocs.filter(d => d.is_public).length;
+      } catch (err) {
+        document.getElementById('doc-list-container').innerHTML =
+          `<div class="empty-state" style="color:var(--danger)">Failed: ${esc(err.message)}</div>`;
+      }
+    }
+
+    async function loadFolders() {
+      try {
+        const data = await api.get('/api/folders');
+        allFolders = data.folders || [];
+        renderFolders();
+      } catch { allFolders = []; }
+    }
+
+    async function loadTags() {
+      try {
+        const data = await api.get('/api/tags');
+        allTags = data.tags || [];
+        renderTags();
+      } catch { allTags = []; }
+    }
+
+    // ─── Sidebar Rendering ─────────────────
+
+    function renderFolders() {
+      const el = document.getElementById('folder-list');
+      if (allFolders.length === 0) {
+        el.innerHTML = '<div style="font-size:0.78rem;color:var(--text-muted);padding:0.2rem 0.5rem;">No folders</div>';
+        return;
+      }
+      el.innerHTML = allFolders.map(f => {
+        const isActive = activeFilter === `folder:${f.id}`;
+        return `<div class="sidebar-item${isActive ? ' active' : ''}" data-filter="folder:${f.id}">
+          <span class="folder-icon">📁</span>
+          ${esc(f.name)}
+          <span class="count">${f.doc_count}</span>
+        </div>`;
+      }).join('');
+      el.querySelectorAll('.sidebar-item').forEach(item => {
+        item.addEventListener('click', () => setFilter(item.dataset.filter));
+        item.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          const fid = item.dataset.filter.replace('folder:', '');
+          folderContextMenu(fid, e);
+        });
+      });
+    }
+
+    function renderTags() {
+      const el = document.getElementById('tag-list');
+      if (allTags.length === 0) {
+        el.innerHTML = '<div style="font-size:0.78rem;color:var(--text-muted);">No tags</div>';
+        return;
+      }
+      el.innerHTML = allTags.map(t => {
+        const isActive = activeTagFilter === t.name;
+        return `<span class="tag-pill${isActive ? ' active' : ''}" data-tag="${esc(t.name)}" style="color:${t.color}">
+          <span class="tag-dot" style="background:${t.color}"></span>
+          ${esc(t.name)}
+        </span>`;
+      }).join('');
+      el.querySelectorAll('.tag-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+          const name = pill.dataset.tag;
+          activeTagFilter = activeTagFilter === name ? null : name;
+          renderTags();
+          renderDocList();
+        });
+      });
+    }
+
+    // ─── Document List ─────────────────────
+
+    function renderDocList() {
+      const container = document.getElementById('doc-list-container');
+      let docs = [...allDocs];
+
+      // Apply filter
+      if (activeFilter === 'public') {
+        docs = docs.filter(d => d.is_public);
+        document.getElementById('view-title').textContent = 'Public Documents';
+      } else if (activeFilter.startsWith('folder:')) {
+        const fid = activeFilter.replace('folder:', '');
+        docs = docs.filter(d => d.folder_id === fid);
+        const folder = allFolders.find(f => f.id === fid);
+        document.getElementById('view-title').textContent = folder ? folder.name : 'Folder';
+      } else {
+        document.getElementById('view-title').textContent = 'All Documents';
+      }
+
+      // Apply tag filter
+      if (activeTagFilter) {
+        docs = docs.filter(d => (d.tags || []).some(t => t.name === activeTagFilter));
+      }
+
+      // Sort
+      if (sortBy === 'updated') docs.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+      else if (sortBy === 'created') docs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      else if (sortBy === 'title') docs.sort((a, b) => a.title.localeCompare(b.title));
+
+      if (docs.length === 0) {
+        container.innerHTML = '<div class="empty-state">No documents here yet.</div>';
+        return;
+      }
+
+      const items = docs.map(doc => {
+        const date = new Date(doc.updated_at || doc.created_at);
+        const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const pubBadge = doc.is_public ? '<span style="color:var(--success)">Public</span>' : '';
+        const tags = (doc.tags || []).map(t =>
+          `<span class="doc-tag" style="background:${t.color}20;color:${t.color}">${esc(t.name)}</span>`
+        ).join('');
+        return `<li class="doc-item">
+          <div>
+            <div class="doc-title"><a href="/e/${doc.slug}">${esc(doc.title)}</a></div>
+            <div class="doc-meta">
+              ${dateStr} ${pubBadge}
+              ${tags ? `<span class="doc-tags">${tags}</span>` : ''}
+            </div>
+          </div>
+        </li>`;
+      }).join('');
+
+      container.innerHTML = `<ul class="doc-list">${items}</ul>`;
+    }
+
+    // ─── Filters ───────────────────────────
+
+    function setFilter(f) {
+      activeFilter = f;
+      // Update sidebar active states
+      document.querySelectorAll('.sidebar-item').forEach(el => el.classList.remove('active'));
+      const active = document.querySelector(`[data-filter="${f}"]`);
+      if (active) active.classList.add('active');
+      renderDocList();
+    }
+
+    document.getElementById('filter-all').addEventListener('click', () => setFilter('all'));
+    document.getElementById('filter-public').addEventListener('click', () => setFilter('public'));
+
+    document.getElementById('sort-select').addEventListener('change', (e) => {
+      sortBy = e.target.value;
+      renderDocList();
+    });
+
+    // ─── Folder/Tag CRUD ────────────────────
+
+    document.getElementById('add-folder-btn').addEventListener('click', async () => {
+      const name = prompt('Folder name:');
+      if (!name || !name.trim()) return;
+      try {
+        await api.post('/api/folders', { name: name.trim() });
+        await loadFolders();
+      } catch (err) { alert(err.message); }
+    });
+
+    document.getElementById('add-tag-btn').addEventListener('click', async () => {
+      const name = prompt('Tag name:');
+      if (!name || !name.trim()) return;
+      try {
+        await api.post('/api/tags', { name: name.trim() });
+        await loadTags();
+      } catch (err) { alert(err.message); }
+    });
+
+    function folderContextMenu(folderId, event) {
+      // Simple rename/delete via prompt
+      const action = prompt('Type "rename" or "delete":');
+      if (!action) return;
+      if (action.toLowerCase() === 'rename') {
+        const name = prompt('New name:');
+        if (name) api.put(`/api/folders/${folderId}`, { name }).then(loadFolders).catch(e => alert(e.message));
+      } else if (action.toLowerCase() === 'delete') {
+        if (confirm('Delete this folder? Documents inside will be unfoldered.')) {
+          api.delete(`/api/folders/${folderId}`).then(loadFolders).catch(e => alert(e.message));
+        }
+      }
+    }
+
+    // ─── Search ─────────────────────────────
+
+    let searchTimeout;
+    document.getElementById('search-input').addEventListener('input', (e) => {
+      clearTimeout(searchTimeout);
+      const q = e.target.value.trim();
+      if (!q) {
+        document.getElementById('search-results').style.display = 'none';
+        document.getElementById('doc-list-container').parentElement.style.display = '';
+        return;
+      }
+      searchTimeout = setTimeout(() => performSearch(q), 300);
+    });
+
+    async function performSearch(q) {
+      const container = document.getElementById('search-results');
+      container.style.display = '';
+      document.getElementById('doc-list-container').parentElement.style.display = 'none';
+      container.innerHTML = '<div style="color:var(--text-muted);padding:0.3rem 0;">Searching…</div>';
+      try {
+        const data = await api.get(`/api/search?q=${encodeURIComponent(q)}`);
+        if (data.results.length === 0) {
+          container.innerHTML = '<div style="color:var(--text-muted);padding:0.3rem 0;">No results.</div>';
+          return;
+        }
+        container.innerHTML = `<div class="search-meta">${data.total} result${data.total !== 1 ? 's' : ''}</div>` +
+          data.results.map(r => `<div class="search-result">
+            <div class="search-result-title"><a href="/e/${r.slug}">${esc(r.title)}</a></div>
+            <div class="search-result-snippet">${r.snippet || ''}</div>
+          </div>`).join('');
+      } catch { container.innerHTML = '<div style="color:var(--danger);padding:0.3rem 0;">Search failed.</div>'; }
+    }
+
+    document.getElementById('search-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        e.target.value = '';
+        document.getElementById('search-results').style.display = 'none';
+        document.getElementById('doc-list-container').parentElement.style.display = '';
+      }
+    });
+
+    // ─── New Doc ────────────────────────────
+
+    document.getElementById('new-doc-btn').addEventListener('click', async () => {
+      try {
+        const data = await api.post('/api/docs', { title: 'Untitled' });
+        window.location.href = `/e/${data.document.slug}`;
+      } catch (err) { alert('Failed: ' + err.message); }
+    });
+
+    document.getElementById('logout-link').addEventListener('click', async (e) => {
+      e.preventDefault();
+      await api.post('/api/auth/logout');
+      window.location.href = '/login';
+    });
+
+    function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+    init();
+  </script>
+</body>
+</html>

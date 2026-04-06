@@ -1,0 +1,18 @@
+[Unit]
+Description=vm-provisioner server
+Requires=vmp-network.service
+After=vmp-network.service
+
+[Service]
+Type=simple
+User=vmp
+Group=vmp
+WorkingDirectory=/opt/vm-provisioner
+EnvironmentFile=/opt/vm-provisioner/deploy/vmp.env
+ExecStart=/usr/local/bin/bun /opt/vm-provisioner/server.js --port ${PORT} --images ${IMAGES_DIR}
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+
+[Install]
+WantedBy=multi-user.target

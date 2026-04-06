@@ -1,0 +1,68 @@
+# Dependencies
+node_modules
+
+# Build output
+out
+dist
+**/target/
+*.tgz
+
+# Lockfiles (binary)
+bun.lockb
+
+# Lockfiles (text)
+package-lock.json
+Cargo.lock
+bun.lock
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Config (real configs — use .example files)
+**/config.toml
+
+# Databases
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/*.sqlite
+
+# Logs
+logs
+*.log
+
+# Caches
+.eslintcache
+.cache
+*.tsbuildinfo
+__pycache__/
+
+# OS
+.DS_Store
+.idea
+
+# Coverage
+coverage
+*.lcov
+
+# User data / uploads
+**/data/uploads/
+**/data/media/
+vidiyo/data/
+
+# Audio / large media
+*.wav
+*.mp3
+*.sf2
+
+# Claude
+*.claude*
+
+# Sandbox
+**/sandbox/
+
+# Agent configs (generated at runtime)
+ai-chat/team-maker/agents/*
+ai-chat/chat-agent/agent.toml

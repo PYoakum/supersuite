@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+# ─────────────────────────────────────────────────────────────
+# receive-project
+# Accepts a base64-encoded project bundle from the host via
+# stdin, decodes it, and extracts into /workspace.
+#
+# Called by serial-listener when HOST_SYNC_BEGIN is detected.
+# Reads chunks from stdin until HOST_SYNC_END.
+#
+# Protocol:
+#   Input:  HOST_SYNC_CHUNK:<base64data> lines on stdin
+#           HOST_SYNC_END terminator on stdin
+#   Output: GUEST_SYNC_OK or GUEST_SYNC_FAIL:<reason> on serial
+# ─────────────────────────────────────────────────────────────
+set -uo pipefail
+
+. /etc/codebaux/protocol.conf
+
+start_time=$(now_s)
+chunk_count=0
+total_bytes=0
+
+trap 'rm -f "${INCOMING_ARCHIVE}"' EXIT
+
+log_and_emit "${GUEST_LOG}[sync] receive-project started"
+
+# ─── Accumulate chunks ───
+rm -f "${INCOMING_ARCHIVE}"
+encoded_data=""
+
+while IFS= read -r line; do
+    # Strip carriage returns if present
+    line="${line%$'\r'}"
+
+    if [[ "${line}" == "${HOST_SYNC_END}" ]]; then
+        log_and_emit "${GUEST_LOG}[sync] HOST_SYNC_END received after ${chunk_count} chunks"
+        break
+    elif [[ "${line}" == "${HOST_SYNC_CHUNK}"* ]]; then
+        chunk_data="${line#${HOST_SYNC_CHUNK}}"
+        encoded_data+="${chunk_data}"
+        chunk_count=$((chunk_count + 1))
+    else
+        # Ignore unrecognized lines during sync (could be noise)
+        log_and_emit "${GUEST_LOG}[sync] ignoring unexpected line during sync"
+    fi
+done
+
+if [[ -z "${encoded_data}" ]]; then
+    log_and_emit "${GUEST_SYNC_FAIL}no data received"
+    exit 1
+fi
+
+# ─── Decode ───
+log_and_emit "${GUEST_LOG}[sync] decoding payload..."
+if ! echo "${encoded_data}" | base64 -d > "${INCOMING_ARCHIVE}" 2>/dev/null; then
+    log_and_emit "${GUEST_SYNC_FAIL}base64 decode failed"
+    exit 1
+fi
+
+total_bytes=$(stat -c %s "${INCOMING_ARCHIVE}" 2>/dev/null || echo 0)
+log_and_emit "${GUEST_LOG}[sync] decoded ${total_bytes} bytes"
+
+# ─── Clean workspace (preserve /workspace/out until new output replaces it) ───
+log_and_emit "${GUEST_LOG}[sync] cleaning workspace..."
+find "${WORKSPACE}" -mindepth 1 -maxdepth 1 ! -name "out" -exec rm -rf {} + 2>/dev/null || true
+
+# ─── Extract ───
+log_and_emit "${GUEST_LOG}[sync] extracting into ${WORKSPACE}..."
+if ! tar -xzf "${INCOMING_ARCHIVE}" -C "${WORKSPACE}" 2>/dev/null; then
+    # Try without gzip (may be plain tar)
+    if ! tar -xf "${INCOMING_ARCHIVE}" -C "${WORKSPACE}" 2>/dev/null; then
+        log_and_emit "${GUEST_SYNC_FAIL}archive extraction failed"
+        exit 1
+    fi
+fi
+
+# ─── Count extracted files ───
+file_count=$(find "${WORKSPACE}" -type f ! -path "${WORKSPACE_OUT}/*" | wc -l)
+elapsed=$(( $(now_s) - start_time ))
+
+log_and_emit "${GUEST_LOG}[sync] extracted ${file_count} file(s) in ${elapsed}s"
+
+# ─── Report success ───
+emit "${GUEST_SYNC_OK}"
+exit 0

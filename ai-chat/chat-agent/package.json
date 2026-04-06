@@ -1,0 +1,24 @@
+{
+  "name": "chat-agent",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "bun --env-file=../.env run src/index.ts",
+    "dev": "bun --env-file=../.env --watch run src/index.ts",
+    "dry-run": "bun --env-file=../.env run src/index.ts --dry-run"
+  },
+  "dependencies": {
+    "docx": "^9.6.1",
+    "mammoth": "^1.12.0",
+    "pdf-lib": "^1.17.1",
+    "smol-toml": "^1.3.0",
+    "yaml": "^2.8.3",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
+}

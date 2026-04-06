@@ -1,0 +1,111 @@
+# VM Provisioner Theme Configuration
+# Customize the look and feel of the web interface
+
+[meta]
+name = "monocore"
+version = "1.0"
+
+[general]
+title = "𝙿𝚁𝙾𝚅𝙸𝚂𝙸𝙾𝙽𝙴𝚁"
+font_family = "ui-monospace, SFMono-Regular, Menlo, Consolas, \"Liberation Mono\", monospace"
+border_radius = 6
+
+[colors]
+# Base
+background = "conic-gradient(#000000 90deg, #ffffff 90deg 180deg, #000000 180deg 270deg, #ffffff 270deg)"
+surface = "#252540"
+surface_hover = "#444"
+surface_alt = "#2a2a4a"
+border = "#333"
+overlay = "rgba(0,0,0,0.7)"
+
+# Text
+text_primary = "#eee"
+text_secondary = "#aaa"
+text_muted = "#888"
+text_inverted = "#000"
+
+# Accent
+accent = "#3b82f6"
+accent_hover = "#2563eb"
+
+# Status
+success = "#4ade80"
+warning = "#f59e0b"
+error = "#ef4444"
+
+# Buttons
+btn_default = "#333"
+btn_default_hover = "#555"
+
+# Toast
+toast_bg = "#333"
+toast_success = "#166534"
+toast_error = "#991b1b"
+
+[typography]
+h1_size = "1.5rem"
+h2_size = "1.2rem"
+body_size = "14px"
+small_size = "12px"
+tiny_size = "11px"
+label_size = "13px"
+
+[spacing]
+page_padding = 20
+section_gap = 16
+element_gap = 8
+small_gap = 4
+
+[components.toolbar]
+padding = "8px 16px"
+font_size = "13px"
+
+[components.cards]
+background = "#252540"
+border_color = "#333"
+padding = 16
+min_width = "320px"
+
+[components.modal]
+background = "#2a2a4a"
+max_width = 480
+padding = 20
+
+[components.badges]
+firecracker = "#f97316"
+qemu = "#8b5cf6"
+docker_compose = "#06b6d4"
+font_size = "10px"
+
+[components.status_dots]
+created = "#888"
+starting = "#fbbf24"
+running = "#4ade80"
+stopping = "#fbbf24"
+stopped = "#666"
+error = "#ef4444"
+
+[components.toast]
+background = "#333"
+success = "#166534"
+error = "#991b1b"
+
+[components.filter]
+background = "#252540"
+active_background = "#3b82f6"
+text_color = "#aaa"
+active_text_color = "#fff"
+
+[components.tabs]
+padding = "10px 20px"
+font_size = "13px"
+background = "transparent"
+active_border = "#3b82f6"
+
+[components.file_browser]
+background = "#252540"
+border_color = "#333"
+row_padding = "8px 12px"
+selected_background = "#3b82f6"
+statusbar_background = "#1e1e38"

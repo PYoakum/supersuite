@@ -1,0 +1,12 @@
+{
+  "name": "vidiyo",
+  "version": "1.0.0",
+  "description": "Browser-based video editor powered by ffmpeg",
+  "scripts": {
+    "dev": "bun run --watch server.js",
+    "start": "bun run server.js"
+  },
+  "dependencies": {
+    "smol-toml": "^1.3.1"
+  }
+}

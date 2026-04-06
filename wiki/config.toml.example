@@ -1,0 +1,20 @@
+[server]
+port = 3000
+host = "0.0.0.0"
+
+[site]
+name = "Wiki"
+
+[auth]
+# Shared password for editing. Leave empty to allow anonymous editing.
+edit_password = "changeme"
+# Secret salt for session token derivation
+salt = "change-this-to-a-random-string"
+# Cookie name
+cookie_name = "wiki_session"
+# Session max age in seconds (default: 7 days)
+max_age = 604800
+
+[wiki]
+# Directory where .md pages are stored (relative to project root)
+pages_dir = "pages"

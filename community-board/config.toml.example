@@ -1,0 +1,48 @@
+[server]
+port = 3000
+hostname = "localhost"
+
+[database]
+host = "localhost"
+port = 5432
+name = "community_board"
+user = "community_board"
+password = "changeme"
+max_connections = 10
+
+[site]
+name = "Community Board"
+description = "A place for discussion"
+threads_per_page = 25
+posts_per_page = 20
+
+[session]
+cookie_name = "cb_session"
+lifetime_hours = 168
+secure = false
+same_site = "Lax"
+
+[registration]
+enabled = true
+min_password_length = 8
+min_username_length = 3
+max_username_length = 32
+
+[uploads]
+max_file_size_mb = 5
+max_images_per_post = 5
+max_avatar_size_mb = 2
+
+[categories]
+allowed_slugs = ["random", "diy", "film", "games", "food-cooking", "literature"]
+
+[content_tags]
+allowed = ["discussion", "request", "donation", "announcement", "information", "instructions"]
+
+[messaging]
+enabled = true
+max_body_length = 10000
+messages_per_page = 25
+
+[moderation]
+default_suspension_hours = 24

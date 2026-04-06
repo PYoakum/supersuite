@@ -1,0 +1,76 @@
+services:
+  # ── Chat server (port 3000) ─────────────────────
+  agent-chat:
+    build:
+      context: .
+      target: agent-chat
+    ports:
+      - "3000:3000"
+    volumes:
+      - chat-data:/app/data
+    restart: unless-stopped
+
+  # ── Task manager (port 3001) ────────────────────
+  team-task:
+    build:
+      context: .
+      target: team-task
+    ports:
+      - "3001:3001"
+    environment:
+      - CHAT_URL=http://agent-chat:3000
+      - NOTIFY_ON_CHANGE=true
+    volumes:
+      - task-data:/app/data
+    depends_on:
+      - agent-chat
+    restart: unless-stopped
+
+  # ── Plan decomposition (port 3200) ──────────────
+  team-maker:
+    build:
+      context: .
+      target: team-maker
+    ports:
+      - "3200:3200"
+    env_file: .env
+    environment:
+      - CHAT_SERVER_URL=http://agent-chat:3000
+      - TASK_SERVER_URL=http://team-task:3001
+    depends_on:
+      - agent-chat
+      - team-task
+    restart: unless-stopped
+
+  # ── Chat agent ──────────────────────────────────
+  # Connects to agent-chat via WebSocket.
+  # TOML configs must use "agent-chat" as hostname:
+  #   url     = "ws://agent-chat:3000/ws"
+  #   api_url = "http://agent-chat:3000"
+  #
+  # Run additional agents:
+  #   docker compose run -d chat-agent bun run src/index.ts --config agents/other.toml
+  chat-agent:
+    build:
+      context: .
+      target: chat-agent
+    env_file: .env
+    volumes:
+      - ./chat-agent/agent.toml:/app/agent.toml:ro
+      - ./chat-agent/agents:/app/agents:ro
+    depends_on:
+      - agent-chat
+    profiles:
+      - agents
+    restart: unless-stopped
+
+# ── TUI ───────────────────────────────────────────
+# install.sh is a local process manager replaced by compose:
+#   docker compose up -d          (replaces: r  — run all)
+#   docker compose down           (replaces: s  — stop all)
+#   docker compose logs -f        (watch output)
+#   docker compose --profile agents up -d  (include chat-agent)
+
+volumes:
+  chat-data:
+  task-data:

@@ -1,0 +1,39 @@
+[server]
+port = 3000
+host = "0.0.0.0"
+
+[imap]
+host = "imap.example.com"
+port = 993
+secure = true
+user = "you@example.com"
+password = "your-password"
+page_size = 50
+
+[smtp]
+host = "smtp.example.com"
+port = 587
+secure = false
+user = "you@example.com"
+password = "your-password"
+from_name = "Your Name"
+from_address = "you@example.com"
+
+[attachments]
+max_upload_size = 26214400  # 25 MB
+
+# [theme]
+# All keys are optional — defaults to a dark theme.
+# bg = "#0d1117"
+# bg_secondary = "#161b22"
+# bg_hover = "#1c2128"
+# bg_surface = "#21262d"
+# border = "#30363d"
+# border_subtle = "#21262d"
+# text = "#c9d1d9"
+# text_bright = "#f0f6fc"
+# text_secondary = "#8b949e"
+# text_muted = "#484f58"
+# accent = "#58a6ff"
+# success = "#238636"
+# danger = "#f85149"

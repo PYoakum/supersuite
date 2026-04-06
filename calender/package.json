@@ -1,0 +1,12 @@
+{
+  "name": "calendar-app",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev:api": "cd apps/api && bun run dev",
+    "dev:desktop": "cd apps/desktop && bun run dev",
+    "dev:web": "cd apps/web && bun run dev",
+    "db:migrate": "cd apps/api && bun run db:migrate",
+    "db:generate": "cd apps/api && bun run db:generate"
+  }
+}

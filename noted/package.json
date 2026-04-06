@@ -1,0 +1,24 @@
+{
+  "name": "noted",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=apps/server",
+    "migrate": "npm run migrate --workspace=apps/server",
+    "build:shared": "npm run build --workspace=packages/shared",
+    "test": "node test-parser-unit.js && node test-editor-unit.js && node test-auth-e2e.js && node test-docs-e2e.js && node test-versions-e2e.js && node test-media-e2e.js && node test-search-e2e.js && node test-organize-e2e.js",
+    "test:auth": "node test-auth-e2e.js",
+    "test:docs": "node test-docs-e2e.js",
+    "test:versions": "node test-versions-e2e.js",
+    "test:parser": "node test-parser-unit.js",
+    "test:editor": "node test-editor-unit.js",
+    "test:media": "node test-media-e2e.js",
+    "test:search": "node test-search-e2e.js",
+    "test:organize": "node test-organize-e2e.js"
+  }
+}

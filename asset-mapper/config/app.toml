@@ -1,0 +1,14 @@
+[server]
+port = 3000
+base_url = "http://localhost:3000"
+log_level = "info"
+
+[database]
+path = "./data/asset-map.db"
+
+[auth]
+mode = "none"
+
+[barcode]
+format = "code128"
+prefix = "asset://device/"

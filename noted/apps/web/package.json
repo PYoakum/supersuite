@@ -1,0 +1,11 @@
+{
+  "name": "@noted/web",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "echo 'client dev not yet configured'"
+  },
+  "dependencies": {
+    "@noted/shared": "*"
+  }
+}

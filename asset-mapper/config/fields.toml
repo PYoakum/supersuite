@@ -1,0 +1,33 @@
+[defaults]
+required = ["name", "category", "status"]
+
+[[extra_fields]]
+category = "it_device"
+fields = [
+  { name = "hostname", label = "Hostname", type = "text", max_length = 253 },
+  { name = "os", label = "Operating System", type = "text" },
+  { name = "cpu", label = "CPU", type = "text" },
+  { name = "ram_gb", label = "RAM (GB)", type = "number" },
+]
+
+[[extra_fields]]
+category = "hardware"
+fields = [
+  { name = "rack_unit", label = "Rack Unit", type = "text" },
+  { name = "power_draw_w", label = "Power Draw (W)", type = "number" },
+]
+
+[[extra_fields]]
+category = "software"
+fields = [
+  { name = "version", label = "Version", type = "text" },
+  { name = "license_key", label = "License Key", type = "text" },
+  { name = "expiry_date", label = "License Expiry", type = "date" },
+]
+
+[[extra_fields]]
+category = "service"
+fields = [
+  { name = "url", label = "Service URL", type = "text" },
+  { name = "sla", label = "SLA", type = "text" },
+]

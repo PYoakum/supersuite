@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>asset-map</title>
+  <link rel="stylesheet" href="/styles/theme.css">
+  <link rel="stylesheet" href="/styles/base.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+<div id="app">
+
+  <!-- Top bar -->
+  <header id="topbar">
+    <span class="topbar-brand">asset-map</span>
+    <div class="topbar-sep"></div>
+
+    <select id="location-select">
+      <option value="">— select location —</option>
+    </select>
+
+    <div class="topbar-sep"></div>
+
+    <div id="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input id="search-input" type="text" placeholder="Search devices, IPs, asset tags, barcodes…" autocomplete="off">
+    </div>
+
+    <div class="topbar-spacer"></div>
+    <button class="btn btn-primary" id="btn-add-device" style="display:none">+ Device</button>
+    <button class="btn" id="btn-add-location">+ Location</button>
+  </header>
+
+  <!-- Main content -->
+  <div id="main">
+
+    <!-- Three.js map canvas -->
+    <div id="map-container">
+      <canvas id="map-canvas"></canvas>
+
+      <!-- Map tooltip -->
+      <div id="map-tooltip">
+        <div class="tooltip-name" id="tooltip-name"></div>
+        <div class="tooltip-meta" id="tooltip-meta"></div>
+      </div>
+
+      <!-- Map overlay controls -->
+      <div id="map-overlay">
+        <button class="map-control-btn" id="btn-reset-camera" title="Reset camera">⌖</button>
+        <button class="map-control-btn" id="btn-reset-layout" title="Reset layout">⟳</button>
+        <button class="map-control-btn" id="btn-toggle-edges" title="Toggle connections">⋯</button>
+      </div>
+    </div>
+
+    <!-- Right panel -->
+    <div id="panel">
+      <div id="panel-tabs">
+        <button class="tab-btn active" data-tab="overview">Overview</button>
+        <button class="tab-btn" data-tab="relations">Relations</button>
+        <button class="tab-btn" data-tab="label">Label</button>
+        <button class="tab-btn" data-tab="history">History</button>
+      </div>
+      <div id="panel-content">
+        <div class="empty-state" id="empty-state">
+          <div class="empty-state-icon">⬡</div>
+          <div>Select a location to view its network map</div>
+          <div style="color:var(--color-text-muted);font-size:11px;margin-top:4px">Click a node to inspect a device</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Barcode label modal -->
+<div id="label-modal">
+  <div class="label-modal-inner">
+    <div class="label-modal-title">Device Label</div>
+    <div class="label-device-name" id="label-device-name"></div>
+    <div class="label-asset-tag" id="label-asset-tag"></div>
+    <canvas id="label-qr-canvas" width="380" height="90" style="width:380px;height:90px"></canvas>
+    <div class="label-barcode-val" id="label-barcode-val"></div>
+    <div class="label-modal-actions">
+      <button class="btn btn-primary" id="btn-print-label">Print</button>
+      <button class="btn" id="btn-close-label">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div id="toast-container"></div>
+
+<!-- Scripts (ES modules) -->
+<script type="module" src="/app.js"></script>
+</body>
+</html>

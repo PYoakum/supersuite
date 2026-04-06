@@ -1,0 +1,17 @@
+{
+  "name": "community-board",
+  "version": "1.0.0",
+  "description": "BBS-style community message board",
+  "scripts": {
+    "dev": "bun run --watch server.js",
+    "start": "bun run server.js",
+    "install-service": "bun run server.js install",
+    "uninstall-service": "bun run server.js uninstall",
+    "service-status": "bun run server.js service-status"
+  },
+  "dependencies": {
+    "marked": "^17.0.1",
+    "postgres": "^3.4.5",
+    "smol-toml": "^1.3.1"
+  }
+}

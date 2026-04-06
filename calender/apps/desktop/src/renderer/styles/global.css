@@ -1,0 +1,19 @@
+@import '@calendar/ui/src/styles/global.css';
+
+/* ── macOS Titlebar (hiddenInset) ───────────────────── */
+.titlebar-drag {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 38px;
+  -webkit-app-region: drag;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+#root {
+  margin-top: 38px;
+  height: calc(100vh - 38px);
+  overflow: hidden;
+}

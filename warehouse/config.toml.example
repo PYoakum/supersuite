@@ -1,0 +1,21 @@
+[server]
+port = 3000
+host = "0.0.0.0"
+
+[database]
+host = "localhost"
+port = 5433
+database = "warehouse"
+user = "warehouse"
+password = "warehouse"
+
+[storage]
+uploads_dir = "data/uploads"
+max_upload_mb = 20
+
+[auth]
+jwt_secret = "change-me-in-production"
+jwt_refresh_secret = "change-me-refresh-secret"
+jwt_expiry = "15m"
+jwt_refresh_expiry = "7d"
+bcrypt_rounds = 12

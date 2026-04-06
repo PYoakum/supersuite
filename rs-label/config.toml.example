@@ -1,0 +1,16 @@
+[printer]
+# Brother PT-D600 USB identifiers
+vendor_id = 0x04F9
+product_id = 0x2074
+
+# USB timeout in milliseconds
+timeout_ms = 5000
+
+# Default directory for image files
+image_dir = "./labels"
+
+# Default threshold for black/white conversion (0-255)
+threshold = 128
+
+# Tape width in mm (common: 6, 9, 12, 18, 24)
+tape_width_mm = 24
